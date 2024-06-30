@@ -59,28 +59,6 @@ public class HotelServiceImpl implements HotelService {
 
         NotNullCopyProperty.copyNonNullProperties(hotelFromRequestForUpdate, hotelFromDBForUpdate, new String[]{});
 
-//        if (StringUtils.hasText(hotelFromRequestForUpdate.getAddress())) {
-//            hotelFromDBForUpdate.setAddress(hotelFromRequestForUpdate.getAddress());
-//        }
-//        if (StringUtils.hasText(hotelFromRequestForUpdate.getCity())) {
-//            hotelFromDBForUpdate.setCity(hotelFromRequestForUpdate.getCity());
-//        }
-//        if (StringUtils.hasText(hotelFromRequestForUpdate.getName())) {
-//            hotelFromDBForUpdate.setName(hotelFromRequestForUpdate.getName());
-//        }
-//        if (StringUtils.hasText(hotelFromRequestForUpdate.getHeadline())) {
-//            hotelFromDBForUpdate.setHeadline(hotelFromRequestForUpdate.getHeadline());
-//        }
-//        if (Objects.nonNull(hotelFromRequestForUpdate.getDistanceToCenter())) {
-//            hotelFromDBForUpdate.setDistanceToCenter(hotelFromRequestForUpdate.getDistanceToCenter());
-//        }
-//        if (Objects.nonNull(hotelFromRequestForUpdate.getHotelRating())) {
-//            hotelFromDBForUpdate.setHotelRating(hotelFromRequestForUpdate.getHotelRating());
-//        }
-//        if (Objects.nonNull(hotelFromRequestForUpdate.getNumberRatings())) {
-//            hotelFromDBForUpdate.setNumberRatings(hotelFromRequestForUpdate.getNumberRatings());
-//        }
-
         return hotelMapper.hotelEntityToHotelResponse(repository.save(hotelFromDBForUpdate));
     }
 

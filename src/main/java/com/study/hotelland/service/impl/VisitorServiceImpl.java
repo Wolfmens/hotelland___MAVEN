@@ -72,12 +72,6 @@ public class VisitorServiceImpl implements VisitorService {
 
         NotNullCopyProperty.copyNonNullProperties(visitorFromRequest, visitorFromDb, new String[]{"password", "authority"});
 
-//        if (StringUtils.hasText(visitorFromRequest.getName())) {
-//            visitorFromDb.setName(visitorFromRequest.getName());
-//        }
-//        if (StringUtils.hasText(visitorFromRequest.getEmail())) {
-//            visitorFromDb.setEmail(visitorFromRequest.getEmail());
-//        }
         if (StringUtils.hasText(visitorFromRequest.getPassword())) {
             visitorFromDb.setPassword(passwordEncoder.encode(visitorFromRequest.getPassword()));
         }
@@ -96,7 +90,7 @@ public class VisitorServiceImpl implements VisitorService {
     @Override
     public Visitor findByName(String name) {
         return repository.findByName(name)
-                .orElseThrow(() ->  new NotFoundEntityException(MessageFormat.format("Visitor with name {0} not found", name)));
+                .orElseThrow(() -> new NotFoundEntityException(MessageFormat.format("Visitor with name {0} not found", name)));
     }
 
     @Override
@@ -107,7 +101,7 @@ public class VisitorServiceImpl implements VisitorService {
     @Override
     public Visitor findVisitorByIdFromBD(Long id) {
         return repository.findById(id)
-                .orElseThrow(() ->  new NotFoundEntityException(MessageFormat
+                .orElseThrow(() -> new NotFoundEntityException(MessageFormat
                         .format("Visitor with id {0} not found", id)));
     }
 }

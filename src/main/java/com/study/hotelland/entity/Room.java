@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "room")
+@Table(name = "rooms")
 public class Room {
 
     @Id

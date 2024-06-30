@@ -1,7 +1,9 @@
 spring:
+  liquibase:
+    enabled: true
   kafka:
     consumer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: kafka:9092
       group-id: ${app.kafka.property.groupId}
       auto-offset-reset: earliest
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
@@ -14,13 +16,13 @@ spring:
         spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
     producer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: kafka:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   data:
     mongodb:
-      uri: mongodb://hotel:hotel@localhost:27017/hotellandDB?authSource=admin
+      uri: mongodb://hotel:hotel@mongodb:27017/hotellandDB?authSource=admin
   jpa:
     properties:
       hibernate:
@@ -29,10 +31,10 @@ spring:
     generate-dll: true
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/hotel_db
+    url: jdbc:postgresql://postgres:5432/hotel_db
     username: admin
     password: 12345
   hikari:

@@ -1,0 +1,135 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-lesson1.yml
+  - changeSet:
+      id: 1
+      author: admin
+      changes:
+          - createTable:
+              tableName: hotels
+              columns:
+                - column:
+                    name: id
+                    type: BIGINT
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      nullable: false
+                - column:
+                    name: name
+                    type: VARCHAR
+                - column:
+                    name: headline
+                    type: VARCHAR
+                - column:
+                    name: city
+                    type: VARCHAR
+                - column:
+                    name: address
+                    type: VARCHAR
+                - column:
+                    name: distance_to_center
+                    type: BIGINT
+                - column:
+                    name: hotel_rating
+                    type: DOUBLE PRECISION
+                - column:
+                    name: number_ratings
+                    type: BIGINT
+          - createTable:
+              tableName: visitors
+              columns:
+                - column:
+                    name: id
+                    type: BIGINT
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      nullable: false
+                - column:
+                    name: name
+                    type: VARCHAR
+                - column:
+                    name: password
+                    type: VARCHAR
+                - column:
+                    name: email
+                    type: VARCHAR
+                - column:
+                    name: authority
+                    type: VARCHAR
+          - createTable:
+              tableName: rooms
+              columns:
+                - column:
+                    name: id
+                    type: BIGINT
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      nullable: false
+                - column:
+                    name: name
+                    type: VARCHAR
+                - column:
+                    name: description
+                    type: VARCHAR
+                - column:
+                    name: number
+                    type: BIGINT
+                - column:
+                    name: price
+                    type: BIGINT
+                - column:
+                    name: max_people
+                    type: BIGINT
+                - column:
+                    name: hotel_id
+                    type: BIGINT
+                    constraints:
+                      foreignKeyName: fkdosq3ww4h9m2osim6o0lugng8
+                      referencedTableName: hotels
+                      referencedColumnNames: id
+          - createTable:
+              tableName: room_block_dates
+              columns:
+                - column:
+                    name: room_id
+                    type: BIGINT
+                    constraints:
+                      nullable: false
+                      foreignKeyName: fkff5wsx2cpy1h8ako8yyhn5a5h
+                      referencedTableName: rooms
+                      referencedColumnNames: id
+                - column:
+                    name: block_dates
+                    type: DATE
+          - createTable:
+              tableName: reservations
+              columns:
+                - column:
+                    name: id
+                    type: BIGINT
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      nullable: false
+                - column:
+                    name: arrival
+                    type: DATE
+                - column:
+                    name: departure
+                    type: DATE
+                - column:
+                    name: visitor_id
+                    type: BIGINT
+                    constraints:
+                      foreignKeyName: fktpc89c5kk5qjg181gxfvwbnaw
+                      referencedTableName: visitors
+                      referencedColumnNames: id
+                - column:
+                    name: room_id
+                    type: BIGINT
+                    constraints:
+                      foreignKeyName: fkm8xumi0g23038cw32oiva2ymw
+                      referencedTableName: rooms
+                      referencedColumnNames: id

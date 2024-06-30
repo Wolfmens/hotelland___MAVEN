@@ -21,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -73,26 +71,9 @@ public class RoomServiceImpl implements RoomService {
 
         NotNullCopyProperty.copyNonNullProperties(roomFromRequest, roomFromDb, new String[]{"blockDates", "hotel"});
 
-//        if (StringUtils.hasText(roomFromRequest.getName())) {
-//            roomFromDb.setName(roomFromRequest.getName());
-//        }
-//        if (StringUtils.hasText(roomFromRequest.getDescription())) {
-//            roomFromDb.setDescription(roomFromRequest.getDescription());
-//        }
-//        if (StringUtils.hasText(roomFromRequest.getDescription())) {
-//            roomFromDb.setDescription(roomFromRequest.getDescription());
-//        }
-//        if (Objects.nonNull(roomFromRequest.getNumber())) {
-//            roomFromDb.setNumber(roomFromRequest.getNumber());
-//        }
-//        if (Objects.nonNull(roomFromRequest.getPrice())) {
-//            roomFromDb.setPrice(roomFromRequest.getPrice());
-//        }
-//        if (Objects.nonNull(roomFromRequest.getMaxPeople())) {
-//            roomFromDb.setMaxPeople(roomFromRequest.getMaxPeople());
-//        }
         if (Objects.nonNull(request.getHotelId())) {
-            roomFromDb.setHotel(hotelService.findHotelByIdFromBD(request.getHotelId()));;
+            roomFromDb.setHotel(hotelService.findHotelByIdFromBD(request.getHotelId()));
+            ;
         }
 
         return roomMapper.roomEntityToRoomResponse(repository.save(roomFromDb));
@@ -117,8 +98,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public Room findRoomByIdFromBD(Long id) {
-       return repository.findById(id)
-                .orElseThrow(() ->  new NotFoundEntityException(MessageFormat
+        return repository.findById(id)
+                .orElseThrow(() -> new NotFoundEntityException(MessageFormat
                         .format("Room with id {0} not found", id)));
     }
 
