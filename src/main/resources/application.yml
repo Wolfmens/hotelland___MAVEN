@@ -1,0 +1,54 @@
+spring:
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: ${app.kafka.property.groupId}
+      auto-offset-reset: earliest
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  data:
+    mongodb:
+      uri: mongodb://hotel:hotel@localhost:27017/hotellandDB?authSource=admin
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    generate-dll: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hotel_db
+    username: admin
+    password: 12345
+  hikari:
+    schema: app_schema
+    connection-init-sql: CREATE SCHEMA IF NOT EXISTS hotel_schema
+    connection-timeout: 10000
+
+app:
+  kafka:
+    property:
+      reservationRecordTopic: "reservationRecordTopic"
+      registrationVisitorTopic: "registrationVisitorTopic"
+      groupId: "hotellandGroupId"
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
