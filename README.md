@@ -112,15 +112,15 @@ ____
    * Доступно только для: ADMIN
    * Метод сервиса: addHotelRating(@params)
    
-   1.6 Получить все отели по определенному фильтру или полю
-   * URL: http://localhost:8080/hotelland/hotel/filter-by
+   1.6 Поставить оценку отелю
+   * URL: http://localhost:8080/hotelland/hotel/rating/{identificator}
    * Метод: PATCH
-   * Параметры запроса: Long newMark
+   * Параметры запроса: Long newMark - оценка
    * Параметр пути: Long hotelId (индентификатор отеля который нужно оценить)
    * Доступно только для: AUTHENTICATED USER
-   * Метод сервиса: filterBy(@params)
+   * Метод сервиса: addHotelRating(@params)
 
-   1.7 Поставить оценку отелю
+   1.7 Получить все отели по определенному фильтру или полю
    * URL: http://localhost:8080/hotelland/hotel/filter-by
    * Метод: GET
    * Параметры по которым нужно получить от фильтрованный список: Long id, String name, headline, city, address;
