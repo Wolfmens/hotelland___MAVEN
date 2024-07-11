@@ -1,195 +1,265 @@
 <h1 align="center">HotelLand</h1>
-<h3 align="center">Contents:</h3>
-1. Resume<br/>
-2. Basic business functions<br/>
-3. Minor functions of logic<br/>
-4. Technologies used<br/>
-5. Launching the application
+<h3 align="center">Содержание:</h3>
+1. Краткое описание приложения<br/>
+2. Защита аутентификации приложения<br/>
+3. Валидность приходящих данных<br/>
+4. Передача данных<br/>
+5. Отправка и прослушивание событий<br/>
+6. Миграция базы данных<br/>
+7. Обработка исключений<br/>
+8. Запускаем приложение<br/>
+9. API взаимодействие с приложением<br/>
+10. Использованные технологии и их версии
 
 ____
-### I. RESUME
+### I. Краткое описание приложения
 
-A hotel booking service in which you can 
-find such functionality as: creating and 
-changing various application entities, obtaining 
-data for a selected entity, booking a selected 
-room for a desired hotel, obtaining statistics on 
-registration and reservations, restrictions by roles 
-and basic protection of application authentication.
+Перед вами сервис бронирования отелей, в котором вы можете
+найти такой функционал, как: создание и
+изменение различных ключевых сущностей приложения, получение
+данные по выбранной сущности, бронирование выбранного
+номера в желаемом отеле, получение статистики по
+регистрации и бронировании, ограничения функционала по ролям
+и базовая защита аутентификации приложений.
 
-And now in more detail...
+А теперь более подробно...
 
 ==================
 
-### II. BASIC BUSINESS FUNCTIONS
+### II. Защита аутентификации приложения
+   Приложение защищено базовой защитой аутентификации пользователя по имени и паролю. 
+   Пользователю доступны два уровня доступа либо USER либо ADMIN. 
+   Настройка осуществляется при помощи встроенных инструментов сервиса Spring Security в классе конфигурации.
+   Поэтому перед тестированием и использованием функционала, целесообразно 
+   создать пользователя, в противном случае доступ к остальным частям функционала будет ограничен.
 
-1. **HOTELS**
-   * Repository: JPA
-   * Using services: HotelService
-   * Roles: ADMIN, AUTHENTICATED USER
+### III. Валидность приходящих данных
+   Валидность входящих данных осуществляется при помощи штатного валидатора Spring.
+   Как пример вы можете заметить, что нельзя создать двух одинаковых пользователей имеющих одинаковые имя или пароль.
+   Так же вам встретится ограничение по оценке отеля от 1 до 5. 
+   В эндпоинтах где нужна пагинация так же возникнет ограничение доступа при отсутствии базовых переменных пагинации. 
+   Встречаются и другие ограничения валидации.
+
+### IV. Передача данных
+   Для удобной, поддерживаемой и понятной передачи данных между слоями приложения используется ряд преобразующих интерфейсов 
+   из которых автоматически генерируются объекты обеспечивающие необходимый функционал для преобразования. 
+   Автоматическая генерация используется при помощи подключенной библиотеки Mapstruct.
+   Преобразования используются как из входящих данных так и в финальные данные отдаваемые пользователю.
+
+### V. Отправка и прослушивание событий
+   В приложении успешно подключен брокер сообщений kafka. Он нам нужен, что бы во время 
+   регистрации пользователя или бронирования комнаты мы слушали данные события и записывали 
+   их в нереляционную базу данных mongo. Ведь вы можете в последующем 
+   выгрузить статистику вышеуказанных событий получив данные из БД.
+
+### VI. Миграция базы данных
+   Так как встроенный в Spring ORM Hibernate в определенный момент времени может неисправно обновлять или создавать данные в БД, 
+   в приложении предусмотрена удобная миграция БД при помощи библиотеки liquibase. 
+
+### VII. Обработка исключений
+   Что бы пользователю были отправлены понятные данные в случае возникновения ошибок (неправильные введенные данные, 
+   совпадения данных, ошибки сервера и т.п.) предусмотрен контроллер по отлову ошибок [RestResponseEntityExceptionHandler.java], 
+   который предоставит пользователю преобразованный понятный объект-ответ.
    
-   Endpoints api: 
+### VIII. Запускаем приложение
+1. Клонируем проект в среду разработки
+2. Убедитесь что Java 21, docker compose 3.x
+3. Запустить приложение можно терминальной командой "docker composer up"
+4. При успешном запуске приложения, можно пользоваться подключенными API
 
-   1.1 Find all hotel from bd:
-   * url: http://localhost:8080/hotelland/hotel/
-   * method: GET
-   * pagination requests params: Integer pageSize, pageNumber
-   * role: ADMIN
+### IX. API взаимодействие с приложением
+
+1. **Работа с отелями**
+   * Используемый репозиторий: JPA [HotelRepository.java]
+   * Используемые сервисы: HotelService [HotelService.java]
+   * Используемые Роли/Полномочия: ADMIN, AUTHENTICATED USER (пользователь должен быть авторизован)
+      
+   Доступные эндпоинты: 
+
+   1.1 Найти и получить все доступные в БД отели:
+   * URL: http://localhost:8080/hotelland/hotel/
+   * Метод: GET
+   * Параметры запроса для пагинации: Integer pageSize, pageNumber
+   * Доступно только для: ADMIN
+   * Метод сервиса: findAll()
    
-   1.2 Find hotel by unique identificator
-   * url: http://localhost:8080/hotelland/hotel/{identificator}
-   * method: GET
-   * path requests params: Long hotelId
-   * role: AUTHENTICATED USER
+   1.2 Найти и получить отель по уникально идентификатору
+   * URL: http://localhost:8080/hotelland/hotel/{identificator}
+   * Метод: GET
+   * Параметр пути: Long hotelId (индентификатор отеля который нужно найти)
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: findById()
    
-   1.3 Create hotel in BD
-   * url: http://localhost:8080/hotelland/hotel
-   * method: POST
-   * body requests: String name, headline, city, address; Long distanceToCenter
-   * role: ADMIN
+   1.3 Создание отеля в БД
+   * URL: http://localhost:8080/hotelland/hotel
+   * Метод: POST
+   * Параметры тела запроса: String name, headline, city, address; Long distanceToCenter
+   * Доступно только для: ADMIN
+   * Метод сервиса: create(@body)
    
-   1.4 Update hotel by unique identificator
-   * url: http://localhost:8080/hotelland/hotel/{identificator}
-   * method: PUT
-   * body requests: String name, headline, city, address; Long distanceToCenter
-   * path requests params: Long hotelId
-   * role: ADMIN
+   1.4 Обновление описания отеля по уникальному идентификатору
+   * URL: http://localhost:8080/hotelland/hotel/{identificator}
+   * Метод: PUT
+   * Параметры тела запроса: String name, headline, city, address; Long distanceToCenter
+   * Параметр пути: Long hotelId (индентификатор отеля который нужно обновить)
+   * Доступно только для: ADMIN
+   * Метод сервиса: update(@params, @body)
    
-   1.5 Delete hotel by unique identificator from BD
-   * url: http://localhost:8080/hotelland/hotel/{identificator}
-   * method: DELETE
-   * path requests params: Long hotelId
-   * role: ADMIN
+   1.5 Удаление упоминание отеля по уникальному идентификатору из БД
+   * URL: http://localhost:8080/hotelland/hotel/{identificator}
+   * Метод: DELETE
+   * Параметр пути: Long hotelId (индентификатор отеля который нужно удалить)
+   * Доступно только для: ADMIN
+   * Метод сервиса: addHotelRating(@params)
    
-   1.6 Filter hotels by params
-   * url: http://localhost:8080/hotelland/hotel/filter-by
-   * method: GET
-   * filter requests params (one or more): Long id, String name, headline, city, address; 
-   Long distanceToCenter, numberRatings; Double hotelRating;
-   * role: AUTHENTICATED USER
+   1.6 Получить все отели по определенному фильтру или полю
+   * URL: http://localhost:8080/hotelland/hotel/filter-by
+   * Метод: PATCH
+   * Параметры запроса: Long newMark
+   * Параметр пути: Long hotelId (индентификатор отеля который нужно оценить)
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: filterBy(@params)
 
-2. **ROOMS**
-   * Repository: JPA
-   * Using services: RoomService
-   * Roles: ADMIN, AUTHENTICATED USER
+   1.7 Поставить оценку отелю
+   * URL: http://localhost:8080/hotelland/hotel/filter-by
+   * Метод: GET
+   * Параметры по которым нужно получить от фильтрованный список: Long id, String name, headline, city, address;
+     Long distanceToCenter, numberRatings; Double hotelRating, Integer pageSize, pageNumber;
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: filterBy(@params)
 
-   Endpoints api:
+2. **Работа с комнатами отеля**
+   * Используемый репозиторий: JPA [RoomRepository.java], [ReservationRepository.java]
+   * Используемые сервисы: RoomService [RoomService.java]
+   * Используемые Роли/Полномочия: ADMIN, AUTHENTICATED USER (пользователь должен быть авторизован)
 
-   2.1 Find all rooms from bd:
-   * url: http://localhost:8080/hotelland/room/
-   * method: GET
-   * role: AUTHENTICATED USER
+   Доступные эндпоинты:
 
-   2.2 Find room by unique identificator
-   * url: http://localhost:8080/hotelland/room/{identificator}
-   * path requests params: Long roomId
-   * role: AUTHENTICATED USER
+   2.1 Найти и получить все сущности комнаты в БД:
+   * URL: http://localhost:8080/hotelland/room/
+   * Метод: GET
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: findAll()
 
-   2.3 Create room by hotel in BD
-   * url: http://localhost:8080/hotelland/room
-   * body requests: String name, description; Long number, price, maxPeople, hotelId
-   * role: ADMIN
+   2.2 Найти и получить сущность комнату по уникальному идентификатору из БД
+   * URL: http://localhost:8080/hotelland/room/{identificator}
+   * Метод: GET
+   * Параметр пути: Long roomId
+   * Доступно только для: AUTHENTICATED USER 
+   * Метод сервиса: findByIdForResponse()
 
-   2.4 Update room by unique identificator
-   * url: http://localhost:8080/hotelland/room/{identificator}
-   * body requests: String name, description; Long number, price, maxPeople, hotelId
-   * path requests params: Long roomId
-   * role: ADMIN
+   2.3 Создание сущности комнаты в базе данных
+   * URL: http://localhost:8080/hotelland/room
+   * Метод: POST
+   * Параметры тела запроса: String name, description; Long number, price, maxPeople, hotelId
+   * Доступно только для: ADMIN
+   * Метод сервиса: create(@body)
 
-   2.5 Delete room by unique identificator from BD
-   * url: http://localhost:8080/hotelland/room/{identificator}
-   * path requests params: Long roomId
-   * role: ADMIN
+   2.4 Обновление сущности комнаты по уникальному идентификатору
+   * URL: http://localhost:8080/hotelland/room/{identificator}
+   * Метод: PUT
+   * Параметры тела запроса: String name, description; Long number, price, maxPeople, hotelId
+   * Параметр пути: Long roomId
+   * Доступно только для: ADMIN
+   * Метод сервиса: update(@param, @body)
 
-   2.6 Filter hotel by params
-   * url: http://localhost:8080/hotelland/room/filter-by
-   * method: GET
-   * filter requests params (one or more): Long id, String description; Long hotelId maxPrice, minPrice, maxPeople;
-     LocaleDate arrival, departure;
-   * role: AUTHENTICATED USER
+   2.5 Удаление сущности комнаты по уникальному идентификатору из БД
+   * URL: http://localhost:8080/hotelland/room/{identificator}
+   * Метод: DELETE
+   * Параметр пути: Long roomId
+   * Доступно только для: ADMIN
+   * Метод сервиса: delete(@param)
 
-3. **VISITORS**
-   * Repository: JPA
-   * Using services: VisitorService
-   * Roles: AUTHENTICATED USER
+   2.6 Получить отфильтрованный список комнат в базе данных по определенному парамметру(-ам)
+   * URL: http://localhost:8080/hotelland/room/filter-by
+   * Метод: GET
+   * Параметры по которым нужно получить от фильтрованный список: Long id, String description;
+   Long hotelId maxPrice, minPrice, maxPeople; LocaleDate arrival, departure;
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: filterBy(@params)
 
-   Endpoints api:
+3. **Работа с посетителями отеля**
+   * Используемый репозиторий: JPA [VisitorRepository.java]
+   * Используемые сервисы: VisitorService [VisitorService.java]
+   * Используемые Роли/Полномочия: AUTHENTICATED USER (пользователь должен быть авторизован)
 
-   3.1 Find all visitors from bd:
-   * url: http://localhost:8080/hotelland/visitor
-   * method: GET
+   Доступные эндпоинты:
 
-   3.2 Find visitor by unique identificator
-   * url: http://localhost:8080/hotelland/visitor/{identificator}
-   * method: GET
-   * path requests params: Long visitorId
+   3.1 Найти всех посетителей в БД:
+   * URL: http://localhost:8080/hotelland/visitor
+   * Метод: GET
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: findAll()
 
-   3.3 Create (registration) visitor in BD
-   * url: http://localhost:8080/hotelland/visitor
-   * method: POST
-   * body requests: String name, password, email
-   * request param: RoleType type (ADMIN, USER)
+   3.2 Найти и получить сущность посетителя по уникальному идентификатору из БД
+   * URL: http://localhost:8080/hotelland/visitor/{identificator}
+   * Метод: GET
+   * Параметр пути: Long visitorId
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: findById(@params) 
 
-   3.4 Update visitor by unique identificator
-   * url: http://localhost:8080/hotelland/visitor/{identificator}
-   * method: PUT
-   * body requests: String name, password, email
-   * path requests params: Long visitorId
+   3.3 Создать(зарегистрировать) посетителя в отеле и БД
+   * URL: http://localhost:8080/hotelland/visitor
+   * Метод: POST
+   * Параметры тела запроса: String name, password, email
+   * Параметры запроса: RoleType type (ADMIN, USER) - здесь при регистрации выбирается какая будет роль или полномочия доступа
+   * Доступно только для: ALL USERS - для всех заходящих на сайт
+   * Метод сервиса: create(@body,@params)
 
-   3.5 Delete visitor by unique identificator from BD
-   * url: http://localhost:8080/hotelland/visitor/{identificator}
-   * method: DELETE
-   * path requests params: Long visitorId
+   3.4 Обновление сущности комнаты по уникальному идентификатору
+   * URL: http://localhost:8080/hotelland/visitor/{identificator}
+   * Метод: PUT
+   * Параметры тела запроса: String name, password, email
+   * Параметры пути запроса: Long visitorId
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: update(@body,@params)
 
-4. **RESERVATION ROOM BY HOTEL**
-   * Repository: JPA
-   * Using services: VisitorService, RoomService, ReservationService
-   * Roles: ADMIN, AUTHENTICATED USER
+   3.5 Удаление сущности пользователя по уникальному идентификатору из БД
+   * URL: http://localhost:8080/hotelland/visitor/{identificator}
+   * Метод: DELETE
+   * Параметры пути запроса: Long visitorId
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: delete(@params)
 
-   Endpoints api:
+4. **Бронирование комнаты пользователем**
+   * Используемый репозиторий: JPA [ReservationRepository.java]
+   * Используемые сервисы: ReservationService [ReservationService.java], [RoomService.java], [VisitorService.java]
+   * Используемые Роли/Полномочия: ADMIN, AUTHENTICATED USER (пользователь должен быть авторизован)
 
-   4.1 Find reservations from bd:
-   * url: http://localhost:8080/hotelland/reservation
-   * method: GET
-   * role: ADMIN
+   Доступные эндпоинты:
 
-   4.3 Create reservation by room and hotel in BD
-   * url: http://localhost:8080/hotelland/reservation
-   * method: POST
-   * body requests: String arrival, departure; Long visitorId, roomId
-   * role: AUTHENTICATED USER
+   4.1 Получить все брони которые осуществлялись за все время из БД:
+   * URL: http://localhost:8080/hotelland/reservation
+   * Метод: GET
+   * Доступно только для: ADMIN
+   * Метод сервиса: findAll()
 
-5. **OBTAINING STATISTICS ON REGISTRATION AND BOOKING**
-   * Repository: MONGO
-   * Using services: RegistrationVisitor, ReservationRecord, StatisticCSV
-   * Roles: ADMIN
+   4.2 Забронировать комнату и создать запись в БД
+   * URL: http://localhost:8080/hotelland/reservation
+   * Метод: POST
+   * Параметры тела запроса: String arrival, departure; Long visitorId, roomId
+   * Доступно только для: AUTHENTICATED USER
+   * Метод сервиса: findAll()
 
-     Endpoints api:
+5. **Выгрузить статистику по зарегистрированным пользователям и осуществленным броням комнат**
+   * Используемый репозиторий:: MONGO [RegistrationVisitorRepository.java], [ReservationRecordRepository.java]
+   * Используемые сервисы:  RegistrationVisitorService [RegistrationVisitorService.java],
+     ReservationRecordService [ReservationRecordService.java], ReservationService [ReservationService.java],
+     StatisticCSVService [StatisticCSVService.java]
+   * Используемые Роли/Полномочия: ADMIN
 
-   5.1 Get statistic:
-   * url: http://localhost:8080/hotelland/statistic
-   * method: GET
-   * role: ADMIN
+     Доступные эндпоинты:
 
-     ==========================
-
-### III. MINOR FUNCTIONS OF LOGIC
-
-   1. The mapstruct lib is used to convert objects into transfers and back
-   2. Kafka is used to send and listen to events when creating (registering) a visitor and booking a room
-   3. To protect the application and unauthorized access, basic protection is used using the spring security lib.
-   4. to obtain statistics, a mongo 
-repository is used in which 
-data is saved as events when 
-listening using kafka, the result of which is a generated csv file
-   5. For the convenience of updating and creating a database, database migration using liquidbase is provided
-   6. The application provides validation of incoming data
-
+   5.1 Получить статистику, статистика будет выгружена и передана пользователю в виде файла в формате csv:
+   * URL: http://localhost:8080/hotelland/statistic
+   * Метод: GET
+   * Доступно только для: ADMIN
+   * Метод сервиса: getStatisticsInCSV()
+   
+   
 ==========================
 
-### IV. TECHNOLOGIES USED
-
-The application used technologies and versions such as:
+### X. Использованные технологии и их версии
 
 * Framework Spring - 6 v.
 * Spring boot - 3.3.1 v.
@@ -200,12 +270,5 @@ The application used technologies and versions such as:
 * Liquibase - 4.28.0
 * Mapstruct - 1.5.3.Final
 * Docker - 3 v.
-
-==========================
-
-### V. LAUNCHING THE APPLICATION
-
-To run the application, Docker must be pre-installed, 
-and the launch is done using the `docker compose up console` command.
 
 ==========================
